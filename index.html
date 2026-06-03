@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Burrakowski — Citazioni Sbagliate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;1,100;1,200;1,300&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #e21414;
+      --dark: #1a0a08;
+      --cream: #f5f0e8;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    /* ── FELT TABLE ──────────────────────────────────────── */
+    #poster {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      /* base felt color */
+      background-color: #1a4a2a;
+      /* woven fabric: cross-hatch diagonals */
+      background-image:
+        repeating-linear-gradient(
+          45deg,
+          transparent 0px,
+          transparent 3px,
+          rgba(0,0,0,.06) 3px,
+          rgba(0,0,0,.06) 4px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          transparent 0px,
+          transparent 3px,
+          rgba(0,0,0,.06) 3px,
+          rgba(0,0,0,.06) 4px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          transparent 7px,
+          rgba(255,255,255,.015) 7px,
+          rgba(255,255,255,.015) 8px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px,
+          transparent 7px,
+          rgba(255,255,255,.015) 7px,
+          rgba(255,255,255,.015) 8px
+        );
+    }
+
+    /* vignette: darker at edges like a lamp over the table */
+    #poster::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse 80% 70% at 50% 48%,
+        transparent 30%,
+        rgba(0,0,0,.45) 100%
+      );
+    }
+
+    /* ── CARD SLOT ───────────────────────────────────────── */
+    #slot-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 0 env(safe-area-inset-bottom, 24px);
+    }
+
+    #card {
+      width: min(92vw, 420px);
+      min-height: 200px;
+      background: var(--cream);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 28px 22px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 48px rgba(0,0,0,.6);
+      transform-origin: bottom center;
+      transition: transform .08s ease;
+    }
+
+    /* card corner suits */
+    #card::before,
+    #card::after {
+      content: '♠';
+      font-size: 13px;
+      color: var(--dark);
+      opacity: .25;
+      position: absolute;
+    }
+    #card::before { top: 10px; left: 14px; }
+    #card::after  { bottom: 10px; right: 14px; transform: rotate(180deg); }
+
+    /* slot window — clips the spinning text */
+    #slot-window {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* the strip that scrolls */
+    #slot-strip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      will-change: transform;
+    }
+
+    .quote-item {
+      width: 100%;
+      text-align: center;
+      padding: 4px 0 12px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 200;
+      font-style: italic;
+      font-size: clamp(16px, 4.8vw, 20px);
+      line-height: 1.45;
+      color: var(--dark);
+      letter-spacing: .01em;
+    }
+
+    #attribution {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-top: 14px;
+      opacity: 0;
+      transition: opacity .4s .1s;
+    }
+    #attribution.show { opacity: 1; }
+
+    /* ── SPIN BUTTON ─────────────────────────────────────── */
+    #spin-btn {
+      width: min(92vw, 420px);
+      height: 56px;
+      background: var(--red);
+      border: none;
+      border-radius: 3px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: #fff;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .15s, transform .1s;
+      margin-bottom: 28px;
+    }
+    #spin-btn:active { transform: scale(.97); background: #b50f0f; }
+    #spin-btn.spinning { background: #7a0909; pointer-events: none; }
+
+    /* ── FOOTER PESSOA ───────────────────────────────────── */
+    #footer-pessoa {
+      width: min(92vw, 420px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    #footer-pessoa span {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 600;
+      font-style: italic;
+      font-size: 13px;
+      letter-spacing: .06em;
+      color: #e21414;
+      text-align: center;
+    }
+    #footer-pessoa img {
+      width: 110px;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 1px 6px rgba(0,0,0,.5));
+    }
+
+    /* ── TOP LOGO ────────────────────────────────────────── */
+    #top-logo {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      padding: calc(env(safe-area-inset-top, 0px) + 32px) 32px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    #top-logo img {
+      width: min(82vw, 440px);
+      height: auto;
+      display: block;
+      filter:
+        drop-shadow(0 2px 0px rgba(0,0,0,.9))
+        drop-shadow(0 0 18px rgba(0,0,0,.7));
+    }
+
+    /* ── SUITS RAIN ──────────────────────────────────────── */
+    #suits-rain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+    .suit-particle {
+      position: absolute;
+      top: -40px;
+      font-size: 22px;
+      opacity: 0;
+      animation: fall linear forwards;
+      color: var(--red);
+    }
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg);   opacity: .8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* ── FLIP ANIMATION ──────────────────────────────────── */
+    @keyframes cardFlip {
+      0%   { transform: scaleX(1); }
+      20%  { transform: scaleX(0); }
+      80%  { transform: scaleX(0); }
+      100% { transform: scaleX(1); }
+    }
+    #card.flip { animation: cardFlip .5s ease; }
+  </style>
+</head>
+<body>
+
+<div id="poster"></div>
+<div id="suits-rain"></div>
+
+<div id="top-logo">
+  <img src="burraco100.svg" alt="Burrakowski">
+</div>
+
+<div id="slot-wrap">
+  <div id="card">
+    <div id="slot-window">
+      <div id="slot-strip">
+        <div class="quote-item" id="display-quote">
+          «Non ho mai capito il burraco,<br>ma ho sempre capito la birra.»
+        </div>
+      </div>
+    </div>
+    <div id="attribution">— Charles Bukowski</div>
+  </div>
+  <button id="spin-btn" onclick="spin()">PESCA UNA CITAZIONE</button>
+  <div id="footer-pessoa">
+    <span>un giochino apocrifo ideato da</span>
+    <img src="pessoa.svg" alt="Pessoa">
+  </div>
+</div>
+
+<script>
+const quotes = [
+  "«Non ho mai capito il burraco,\nma ho sempre capito la birra.»",
+  "«La vita è bella\nsolo quando non la guardi.»",
+  "«Ho perso tante cose: le chiavi di casa,\nil portafoglio, la voglia di vivere.\nMai le mie carte.»",
+  "«Bevi finché non vedi due di ogni cosa.\nPoi scegli quello che ti piace di più.»",
+  "«I poeti fanno cose stupide.\nIo faccio cose stupide.\nForse sono un poeta.»",
+  "«Non cercare il senso della vita.\nNon trovi nemmeno le calze nel cassetto.»",
+  "«Amo le donne che perdono a burraco\nsenza piangere. Sono rare.»",
+  "«Il segreto della felicità?\nL'ho dimenticato con tutto il resto.»",
+  "«Ci sono due tipi di persone:\nquelli che giocano a burraco\ne quelli che mentono.»",
+  "«L'amore è soltanto un modo elegante\nper fumare da soli.»",
+  "«Chi si sveglia presto\nnon ha capito niente della notte.»",
+  "«La poesia serve a chi non riesce\na pagare l'affitto dell'anima.»",
+  "«I bar sono biblioteche\nper gente senza speranza.»",
+  "«Non fidarti di chi beve acqua\ne sorride troppo.»",
+  "«Le città migliori puzzano sempre\nun po' di benzina e malinconia.»",
+  "«Il problema del mondo è che\nla gente sobria prende decisioni.»",
+  "«Le persone felici non scrivono mai\nniente di interessante.»",
+  "«La rivoluzione comincia quando smetti\ndi rispondere ai messaggi.»",
+  "«Ogni sigaretta è una lettera d'amore\nspedita al caos.»",
+  "«Chi parla piano\nnasconde sempre una guerra.»",
+  "«I filosofi spiegano il dolore.\nI cani lo capiscono.»",
+  "«La dignità è sopravvalutata\ndopo il terzo bicchiere.»",
+  "«La vera povertà\nè dover fare networking.»",
+  "«Ho incontrato gente meravigliosa\nnei posti peggiori.»",
+  "«La domenica è il modo\nche ha il tempo di insultarti.»",
+  "«L'inferno non esiste.\nÈ solo una fila alle poste.»",
+  "«La nostalgia è una sbornia senza vino.»",
+  "«Chi vuole salvarti\nspesso vuole solo controllarti.»",
+  "«I migliori dialoghi li ho avuti\ncon persone che non ricordo.»",
+  "«La notte rende tutti più sinceri\ne molto meno intelligenti.»",
+  "«Scrivere bene significa\nsanguinare senza fare rumore.»",
+  "«I pessimisti durano più a lungo alle feste.»",
+  "«La libertà è avere\nabbastanza tempo da perdere.»",
+  "«La gente chiama cinismo\nquello che resta dopo aver creduto troppo.»",
+  "«Ogni città ha un cuore rotto\nnascosto dietro i supermercati.»",
+  "«L'arte è quello che succede\nquando smetti di comportarti bene.»",
+  "«I romantici finiscono sempre\nnei posti più rumorosi.»",
+  "«La vita adulta è cercare accendini\nche erano tuoi.»",
+  "«Ci sono persone che entrano nei bar\ncome se chiedessero scusa.»",
+  "«Napoli non si spiega.\nSi beve.»",
+  "«Un mazzo di carte in mano\nvale più di mille poesie nel cassetto.»",
+  "«Ho scritto poesie ubriaco.\nLe ho rilette sobrio.\nNon cambiava niente.»",
+  "«La fortuna aiuta gli audaci.\nGli altri si arrangiano\ncon le carte che hanno.»",
+  "«Non rimpiango nulla,\ntranne quella notte a Napoli\nche non ricordo.»",
+  "«Gioca come se non avessi niente da perdere.\nHai già perso tutto.»",
+  "«I migliori momenti della mia vita\nli ho trascorsi seduto\ncon degli sconosciuti.»",
+  "«Non c'è niente di più onesto\ndi un asso di picche.»",
+  "«Il burraco è la metafora della vita:\nnon sai mai cosa ti capiterà in mano.»",
+  "«Ho vissuto male.\nL'importante è che l'ho vissuto.»",
+  "«L'alcol non risolve i problemi.\nMa nemmeno l'acqua.»",
+  "«Qualcuno deve pur perdere.\nDi solito sono io.\nVa bene così.»",
+  "«Le carte non mentono.\nGli uomini sì.\nPer questo preferisco le carte.»",
+  "«Non sono un giocatore.\nSono un uomo con un mazzo di carte\ne niente da fare.»",
+  "«La poesia è quello che succede\nquando non sai più che pescare.»",
+  "«Ho vinto poco nella vita.\nMa ho sempre perso con stile.»",
+];
+
+let isSpinning = false;
+let currentIdx = 0;
+
+function getQuote() {
+  let idx;
+  do { idx = Math.floor(Math.random() * quotes.length); } while (idx === currentIdx);
+  currentIdx = idx;
+  return quotes[idx];
+}
+
+function formatQuote(raw) {
+  return raw.replace(/\n/g, '<br>');
+}
+
+function spawnSuits() {
+  const rain = document.getElementById('suits-rain');
+  const suits = ['♠','♥','♦','♣'];
+  for (let i = 0; i < 14; i++) {
+    setTimeout(() => {
+      const s = document.createElement('span');
+      s.className = 'suit-particle';
+      s.textContent = suits[Math.floor(Math.random() * suits.length)];
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.fontSize = (16 + Math.random() * 20) + 'px';
+      const dur = .8 + Math.random() * .8;
+      s.style.animationDuration = dur + 's';
+      s.style.color = Math.random() > .5 ? '#e21414' : '#1a0a08';
+      rain.appendChild(s);
+      setTimeout(() => s.remove(), dur * 1000 + 100);
+    }, i * 55);
+  }
+}
+
+function spin() {
+  if (isSpinning) return;
+  isSpinning = true;
+
+  const btn = document.getElementById('spin-btn');
+  const card = document.getElementById('card');
+  const display = document.getElementById('display-quote');
+  const attr = document.getElementById('attribution');
+
+  btn.classList.add('spinning');
+  btn.textContent = '— — —';
+  attr.classList.remove('show');
+  spawnSuits();
+
+  // Fast-cycle random quotes
+  let cycles = 0;
+  const maxCycles = 14;
+  const targetQuote = getQuote();
+
+  const cycle = setInterval(() => {
+    const random = quotes[Math.floor(Math.random() * quotes.length)];
+    display.innerHTML = formatQuote(random);
+    cycles++;
+    if (cycles >= maxCycles) {
+      clearInterval(cycle);
+      // Card flip reveal
+      card.classList.add('flip');
+      setTimeout(() => {
+        display.innerHTML = formatQuote(targetQuote);
+        card.classList.remove('flip');
+        attr.classList.add('show');
+        btn.classList.remove('spinning');
+        btn.textContent = 'PESCA UNA CITAZIONE';
+        isSpinning = false;
+      }, 250);
+    }
+  }, 90);
+}
+
+// init with random
+window.addEventListener('load', () => {
+  currentIdx = Math.floor(Math.random() * quotes.length);
+  document.getElementById('display-quote').innerHTML = formatQuote(quotes[currentIdx]);
+  document.getElementById('attribution').classList.add('show');
+});
+</script>
+</body>
+</html>
