@@ -74,33 +74,7 @@
       );
     }
 
-    /* ── FACCIA ──────────────────────────────────────────── */
-    #faccia-wrap {
-      position: fixed;
-      top: 22vh;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9;
-      pointer-events: none;
-    }
-
-    #faccia {
-      width: min(42vw, 180px);
-      height: auto;
-      display: block;
-      transform-origin: top center;
-      animation: dondola 3.4s ease-in-out infinite;
-      mix-blend-mode: screen;
-      filter: drop-shadow(0 6px 16px rgba(0,0,0,.6));
-    }
-
-    @keyframes dondola {
-      0%   { transform: rotate(-7deg); }
-      50%  { transform: rotate(7deg);  }
-      100% { transform: rotate(-7deg); }
-    }
-
-    /* ── CARD SLOT ───────────────────────────────────────── */
+    /* ── LAYOUT PRINCIPALE ───────────────────────────────── */
     #slot-wrap {
       position: fixed;
       inset: 0;
@@ -109,22 +83,52 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      padding: 0 0 env(safe-area-inset-bottom, 24px);
+      /* spazio per il logo fisso in cima */
+      padding-top: calc(env(safe-area-inset-top, 0px) + 18vh);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
     }
 
+    /* ── FACCIA ──────────────────────────────────────────── */
+    #faccia-wrap {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      min-height: 0;
+    }
+
+    #faccia {
+      width: min(38vw, 150px);
+      height: auto;
+      display: block;
+      transform-origin: top center;
+      animation: dondola 3.4s ease-in-out infinite;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,.5));
+    }
+
+    @keyframes dondola {
+      0%   { transform: rotate(-7deg); }
+      50%  { transform: rotate(7deg);  }
+      100% { transform: rotate(-7deg); }
+    }
+
+    /* ── CARD ────────────────────────────────────────────── */
     #card {
       width: min(92vw, 420px);
-      min-height: 200px;
+      min-height: 0;
       background: var(--cream);
       border-radius: 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 28px 28px 22px;
+      padding: 20px 24px 16px;
       position: relative;
       overflow: hidden;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       box-shadow: 0 8px 48px rgba(0,0,0,.6);
       transform-origin: bottom center;
       transition: transform .08s ease;
@@ -160,12 +164,12 @@
     .quote-item {
       width: 100%;
       text-align: center;
-      padding: 4px 0 12px;
+      padding: 2px 0 8px;
       font-family: 'Barlow', sans-serif;
       font-weight: 200;
       font-style: italic;
-      font-size: clamp(16px, 4.8vw, 20px);
-      line-height: 1.45;
+      font-size: clamp(14px, 4.2vw, 18px);
+      line-height: 1.4;
       color: var(--dark);
       letter-spacing: .01em;
     }
@@ -173,11 +177,11 @@
     #attribution {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: .18em;
       text-transform: uppercase;
       color: var(--red);
-      margin-top: 14px;
+      margin-top: 10px;
       opacity: 0;
       transition: opacity .4s .1s;
     }
@@ -199,7 +203,7 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: background .15s, transform .1s;
-      margin-bottom: 28px;
+      margin-bottom: 10px;
     }
     #spin-btn:active { transform: scale(.97); background: #b50f0f; }
     #spin-btn.spinning { background: #7a0909; pointer-events: none; }
@@ -210,8 +214,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 32px;
+      gap: 6px;
+      margin-bottom: 10px;
     }
     #footer-pessoa span {
       font-family: 'Barlow', sans-serif;
@@ -285,15 +289,14 @@
 <div id="poster"></div>
 <div id="suits-rain"></div>
 
-<div id="faccia-wrap">
-  <img id="faccia" src="faccia.png" alt="">
-</div>
-
 <div id="top-logo">
   <img src="burraco100.svg" alt="Burrakowski">
 </div>
 
 <div id="slot-wrap">
+  <div id="faccia-wrap">
+    <img id="faccia" src="faccia.png" alt="">
+  </div>
   <div id="card">
     <div id="slot-window">
       <div id="slot-strip">
@@ -302,7 +305,7 @@
         </div>
       </div>
     </div>
-    <div id="attribution">— Charles Bukowski</div>
+    <div id="attribution">— Charles Burrakowski</div>
   </div>
   <button id="spin-btn" onclick="spin()">PESCA UNA CITAZIONE</button>
   <div id="footer-pessoa">
