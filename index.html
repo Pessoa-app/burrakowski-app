@@ -74,6 +74,32 @@
       );
     }
 
+    /* ── FACCIA ──────────────────────────────────────────── */
+    #faccia-wrap {
+      position: fixed;
+      top: 22vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9;
+      pointer-events: none;
+    }
+
+    #faccia {
+      width: min(42vw, 180px);
+      height: auto;
+      display: block;
+      transform-origin: top center;
+      animation: dondola 3.4s ease-in-out infinite;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,.6));
+    }
+
+    @keyframes dondola {
+      0%   { transform: rotate(-7deg); }
+      50%  { transform: rotate(7deg);  }
+      100% { transform: rotate(-7deg); }
+    }
+
     /* ── CARD SLOT ───────────────────────────────────────── */
     #slot-wrap {
       position: fixed;
@@ -258,6 +284,10 @@
 
 <div id="poster"></div>
 <div id="suits-rain"></div>
+
+<div id="faccia-wrap">
+  <img id="faccia" src="faccia.png" alt="">
+</div>
 
 <div id="top-logo">
   <img src="burraco100.svg" alt="Burrakowski">
